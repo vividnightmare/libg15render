@@ -4,6 +4,8 @@ SUBDIRS = src
 
 EXTRA_DIST = debian Doxyfile libg15render.3 fonts
 
+ACLOCAL_AMFLAGS = -I m4
+
 MAINTAINERCLEANFILES = \
     configure \
     Makefile.in \

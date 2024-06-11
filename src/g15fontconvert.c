@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdio.h>
 #ifdef TTF_SUPPORT
 #include <ft2build.h>
 #include FT_FREETYPE_H

@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 static g15font *defaultfont[40];
 
@@ -333,7 +334,7 @@ g15font * g15r_loadG15Font(char *filename) {
     font->default_gap = buffer[14];
     unsigned int current_alloc = 2048;
     char *glyphBuf =  malloc(current_alloc);
-    char *glyphPtr = glyphBuf;
+    uintptr_t offset = 0;
     unsigned int memsize=0;
     for (i=0;i <font->numchars; i++) {
         unsigned char charheader[G15_CHAR_HEADER_SIZE];
@@ -346,11 +347,14 @@ g15font * g15r_loadG15Font(char *filename) {
             current_alloc+=((font->font_height * ((font->glyph[character].width + 7) / 8)*(font->numchars - i)));
             glyphBuf = realloc(glyphBuf,(size_t)current_alloc);
         }
-        font->glyph[character].buffer = (unsigned char*)glyphPtr;
+        font->glyph[character].buffer = (unsigned char*)offset;
         font->glyph[character].gap = 0;
-        fread(font->glyph[character].buffer, font->font_height * ((font->glyph[character].width + 7) / 8), 1, file);
+        fread(glyphBuf + (unsigned long long)font->glyph[character].buffer, font->font_height * ((font->glyph[character].width + 7) / 8), 1, file);
         font->active[character] = 1;
-        glyphPtr+=(font->font_height * ((font->glyph[character].width + 7) / 8));
+        offset+=(font->font_height * ((font->glyph[character].width + 7) / 8));
+    }
+    for (i=0;i <G15_MAX_GLYPH; i++) {
+        font->glyph[i].buffer = (unsigned char*)(glyphBuf + (uintptr_t)font->glyph[i].buffer);
     }
 
     fclose(file);
